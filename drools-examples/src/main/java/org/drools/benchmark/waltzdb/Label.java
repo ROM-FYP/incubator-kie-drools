@@ -18,13 +18,14 @@
  */
 package org.drools.benchmark.waltzdb;
 //(literalize label id type name n1 n2 n3)
-public class Label {
+public class Label implements ClusterAware {
     private String id;
     private String type;
     private String name;
     private String n1;
     private String n2;
     private String n3;
+    private String clusterId;
     public Label() {
         super();
     }
@@ -72,6 +73,12 @@ public class Label {
     }
     public void setType(String type) {
         this.type = type;
+    }
+    public String getClusterId() {
+        return clusterId;
+    }
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
     }
 
     public int hashCode() {

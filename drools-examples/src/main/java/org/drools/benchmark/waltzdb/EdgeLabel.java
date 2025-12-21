@@ -18,11 +18,12 @@
  */
 package org.drools.benchmark.waltzdb;
 //(literalize edge_label p1 p2 l_name l_id)
-public class EdgeLabel {
+public class EdgeLabel implements ClusterAware {
     private int p1;
     private int p2;
     private String labelName;
     private String labelId;
+    private String clusterId;
     public EdgeLabel() {
         super();
     }
@@ -32,6 +33,14 @@ public class EdgeLabel {
         this.p2 = p2;
         this.labelName = labelName;
         this.labelId = labelId;
+    }
+    public EdgeLabel(int p1, int p2, String labelName, String labelId, String clusterId) {
+        super();
+        this.p1 = p1;
+        this.p2 = p2;
+        this.labelName = labelName;
+        this.labelId = labelId;
+        this.clusterId = clusterId;
     }
 
     public int hashCode() {
@@ -91,5 +100,11 @@ public class EdgeLabel {
     }
     public void setP2(int p2) {
         this.p2 = p2;
+    }
+    public String getClusterId() {
+        return clusterId;
+    }
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
     }
 }

@@ -18,9 +18,10 @@
  */
 package org.drools.benchmark.waltzdb;
 
-public class Line {
+public class Line implements ClusterAware {
     private int p1;
     private int p2;
+    private String clusterId;
     public Line() {
         super();
     }
@@ -35,6 +36,12 @@ public class Line {
     }
     public void setP2(int p2) {
         this.p2 = p2;
+    }
+    public String getClusterId() {
+        return clusterId;
+    }
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
     }
 
     public int hashCode() {

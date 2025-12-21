@@ -57,14 +57,18 @@ public class WaltzDbBenchmark {
         final InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConfiguration);
         //                final RuleBase ruleBase = RuleBaseFactory.newRuleBase( RuleBase.RETEOO,
         //                                                               conf );
-
+        int iterations =100;
+        double average_time =0;
+        KieSession ksession;
         kbase.addPackages( pkgs );
 
-        KieSession ksession = kbase.newKieSession();
 
         List<Line> lines = WaltzDbBenchmark.loadLines( "waltzdb16.dat" ); //12,8,4
         List<Label> labels = WaltzDbBenchmark.loadLabels( "waltzdb16.dat" ); //12,8,4
-        long now = System.currentTimeMillis();
+        for (int t=0;t<iterations;t++){
+            ksession = kbase.newKieSession();
+            long now = System.currentTimeMillis();
+            System.out.println( "Iteration: " + t );
         for ( Line line: lines ) {
             ksession.insert( line );
             System.out.println( line.getP1() + " " + line.getP2() );
@@ -78,7 +82,10 @@ public class WaltzDbBenchmark {
         ksession.insert( stage );
         ksession.fireAllRules();
         System.out.println( "Time: " + (System.currentTimeMillis() - now) );
-        ksession.dispose();
+            average_time += (System.currentTimeMillis() - now);
+            ksession.dispose();
+        }
+        System.out.println( "Average Time: " + (average_time/iterations) );
 
     }
 
@@ -95,6 +102,7 @@ public class WaltzDbBenchmark {
                 if ( m.matches() ) {
                     Line l = new Line( Integer.parseInt( m.group( 1 ) ),
                                        Integer.parseInt( m.group( 2 ) ) );
+                    l.setClusterId("2");
                     result.add( l );
                 }
                 line = reader.readLine();
@@ -123,6 +131,7 @@ public class WaltzDbBenchmark {
                                          m.group( 4 ),
                                          m.group( 5 ),
                                          m.group( 6 ) );
+                    l.setClusterId("1");
                     result.add( l );
                 }
                 line = reader.readLine();

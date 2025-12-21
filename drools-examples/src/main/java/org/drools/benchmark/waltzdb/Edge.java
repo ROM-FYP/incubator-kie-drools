@@ -20,11 +20,12 @@ package org.drools.benchmark.waltzdb;
 
 
 //(literalize edge type p1 p2 joined)
-public class Edge {
+public class Edge implements ClusterAware {
     private String type;
     private int p1;
     private int p2;
     private boolean joined;
+    private String clusterId;
     public Edge() {
         super();
     }
@@ -45,6 +46,19 @@ public class Edge {
         super();
         this.p1 = p1;
         this.p2 = p2;
+    }
+    public Edge(int p1, int p2, String clusterId) {
+        super();
+        this.p1 = p1;
+        this.p2 = p2;
+        this.clusterId = clusterId;
+    }
+    public Edge(int p1, int p2, boolean joined, String clusterId) {
+        super();
+        this.p1 = p1;
+        this.p2 = p2;
+        this.joined = joined;
+        this.clusterId = clusterId;
     }
 
     public int hashCode() {
@@ -101,5 +115,11 @@ public class Edge {
     }
     public void setType(String type) {
         this.type = type;
+    }
+    public String getClusterId() {
+        return clusterId;
+    }
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
     }
 }

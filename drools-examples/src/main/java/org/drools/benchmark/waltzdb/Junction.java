@@ -18,7 +18,7 @@
  */
 package org.drools.benchmark.waltzdb;
 //(literalize junction p1 p2 p3 base_point type name visited)
-public class Junction {
+public class Junction implements ClusterAware {
 
     public static String L = "L";
     public Junction() {
@@ -38,6 +38,7 @@ public class Junction {
     private String type;
     private String name;
     private String visited;
+    private String clusterId;
     public Junction(String type, String name, int basePoint, int p1,int p2, String visited){
         super();
         this.p1 = p1;
@@ -46,6 +47,10 @@ public class Junction {
         this.type = type;
         this.name = name;
         this.visited = visited;
+    }
+    public Junction(String type, String name, int basePoint, int p1, int p2, String visited, String clusterId){
+        this(type, name, basePoint, p1, p2, visited);
+        this.clusterId = clusterId;
     }
     public Junction(int p1, int p2, int p3, int basePoint, String type, String name, String visited) {
         super();
@@ -56,6 +61,10 @@ public class Junction {
         this.type = type;
         this.name = name;
         this.visited = visited;
+    }
+    public Junction(int p1, int p2, int p3, int basePoint, String type, String name, String visited, String clusterId) {
+        this(p1, p2, p3, basePoint, type, name, visited);
+        this.clusterId = clusterId;
     }
     public Junction(int basePoint, String type, String name, String visited) {
         super();
@@ -105,6 +114,12 @@ public class Junction {
     }
     public void setVisited(String visited) {
         this.visited = visited;
+    }
+    public String getClusterId() {
+        return clusterId;
+    }
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
     }
 
     public int hashCode() {
