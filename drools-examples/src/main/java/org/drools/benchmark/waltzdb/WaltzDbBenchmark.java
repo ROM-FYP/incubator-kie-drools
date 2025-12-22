@@ -57,7 +57,7 @@ public class WaltzDbBenchmark {
         final InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConfiguration);
         //                final RuleBase ruleBase = RuleBaseFactory.newRuleBase( RuleBase.RETEOO,
         //                                                               conf );
-        int iterations = 10;
+        int iterations = 100;
         double average_time = 0;
         KieSession ksession;
         kbase.addPackages(pkgs);
@@ -70,18 +70,19 @@ public class WaltzDbBenchmark {
             long now = System.currentTimeMillis();
             for (Line line : lines) {
                 ksession.insert(line);
-                System.out.println(line.getP1() + " " + line.getP2());
+                //System.out.println(line.getP1() + " " + line.getP2());
             }
             for (Label label : labels) {
                 ksession.insert(label);
-                System.out.println(label.getId() + " " + label.getType());
+                //System.out.println(label.getId() + " " + label.getType());
             }
 
             Stage stage = new Stage(Stage.DUPLICATE);
             ksession.insert(stage);
             ksession.fireAllRules();
-            average_time += (System.currentTimeMillis() - now);
-            System.out.println("Time: " + (System.currentTimeMillis() - now));
+            long time = System.currentTimeMillis() - now;
+            average_time += time;
+            System.out.println("Iteration " + (t+1) + " of " + iterations + " finished in " + time + "ms");
             ksession.dispose();
 
         }
