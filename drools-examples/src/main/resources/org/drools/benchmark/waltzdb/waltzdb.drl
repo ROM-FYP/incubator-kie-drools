@@ -29,27 +29,6 @@ import org.drools.benchmark.waltzdb.Label;
 import org.drools.benchmark.waltzdb.Illegal;
 import org.drools.benchmark.waltzdb.ClusterAware;
 
-rule "Switch to Group 1"
-    when
-        $count : Number( intValue >= 10 ) from accumulate(
-            $c : ClusterAware( clusterId == "1" ) over window:length(10),
-            count(1)
-        )
-    then
-        ((org.kie.api.runtime.rule.Agenda) kcontext.getKnowledgeRuntime().getAgenda()).activateRuleFlowGroup("1");
-        System.out.println("Context Switched to Group 1 due to high event density (count=" + $count + ")");
-end
-
-rule "Switch to Group 2"
-    when
-        $count : Number( intValue >= 10 ) from accumulate(
-            $c : ClusterAware( clusterId == "2" ) over window:length(10),
-            count(1)
-        )
-    then
-        ((org.kie.api.runtime.rule.Agenda) kcontext.getKnowledgeRuntime().getAgenda()).activateRuleFlowGroup("2");
-        System.out.println("Context Switched to Group 2 due to high event density (count=" + $count + ")");
-end
 
 /*
 // Reverse the edges
@@ -62,7 +41,7 @@ end
 //    (remove 2))
 */
 rule "reverse_edges"
-    ruleflow-group "2"
+    agenda-group "2"
     when
         Stage( value == Stage.DUPLICATE )
         $line : Line( $p1:p1, $p2:p2 )
@@ -80,7 +59,7 @@ end
 //    -->
 //    (modify 1 ^value detect_junctions))
 rule "done_reversing"
-    ruleflow-group "2"
+    agenda-group "2"
     when
         $stage : Stage( value == Stage.DUPLICATE )
         not ( Line( ) )
@@ -106,7 +85,7 @@ end
     (modify 4 ^type 3j ^joined true))
 */
 rule "make_3_junction"
-    ruleflow-group "2"
+    agenda-group "2"
     when
         Stage( value == Stage.DETECT_JUNCTIONS )
         $edge1 : Edge( $basePoint : p1, $p1 : p2, joined == false )
@@ -140,7 +119,7 @@ end
 
 */
 rule "make_L"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.DETECT_JUNCTIONS )
         $edge1 : Edge( $basePoint : p1, $p2 : p2, joined == false )
@@ -163,7 +142,7 @@ end
 
 */
 rule "done_detecting"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.DETECT_JUNCTIONS )
         not( Edge ( joined == false ) )
@@ -186,7 +165,7 @@ end
     (modify 1 ^value find_second_boundary))
 */
 rule "initial_boundary_junction_L"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
         $junction : Junction( type == "2j", $basePoint : basePoint, $p1 : p1, $p2 : p2 )
@@ -218,7 +197,7 @@ end
 
 */
 rule "initial_boundary_junction_arrow"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
         $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
@@ -251,7 +230,7 @@ end
 
 */
 rule "second_boundary_junction_L"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
         $junction : Junction( type == "2j", $basePoint : basePoint, $p1 : p1, $p2 : p2 )
@@ -284,7 +263,7 @@ end
 
 */
 rule "second_boundary_junction_arrow"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
         $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
@@ -311,7 +290,7 @@ end
 
 */
 rule "start_visit_3_junction"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.LABELING )
         $junction : Junction( type == "3j", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "no" )
@@ -340,7 +319,7 @@ end
 
 */
 rule "visit_3j_0"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -378,7 +357,7 @@ end
 
 */
 rule "visit_3j_1"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -416,7 +395,7 @@ end
 
 */
 rule "visit_3j_2"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -454,7 +433,7 @@ end
 
 */
 rule "visit_3j_3"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -492,7 +471,7 @@ end
 
 */
 rule "visit_3j_4"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -530,7 +509,7 @@ end
 
 */
 rule "visit_3j_5"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -568,7 +547,7 @@ end
 
 */
 rule "visit_3j_6"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -606,7 +585,7 @@ end
 
 */
 rule "visit_3j_7"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -635,7 +614,7 @@ end
 
 */
 rule "start_visit_2_junction"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.LABELING )
         $junction : Junction( $basePoint : basePoint, type == "2j", $p1 : p1, $p2 : p2, visited == "no" )
@@ -663,7 +642,7 @@ end
 
 */
 rule "visit_2j_0"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -695,7 +674,7 @@ end
 
 */
 rule "visit_2j_1"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -727,7 +706,7 @@ end
 
 */
 rule "visit_2j_2"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -760,7 +739,7 @@ end
 
 */
 rule "visit_2j_3"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $name : name, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -785,7 +764,7 @@ end
 
 */
 rule "end_visit"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : ( Stage( value == Stage.VISITING_2J ) or Stage( value == Stage.VISITING_3J ) )
         $junction : Junction( visited == "now" )
@@ -804,7 +783,7 @@ end
 
 */
 rule "marking"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.MARKING )
         Junction( $basePoint : basePoint, visited == "now" )
@@ -823,7 +802,7 @@ end
     (modify 2 ^visited yes))
 */
 rule "stop_marking"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.MARKING )
         $junction : Junction( $basePoint : basePoint, visited == "now" )
@@ -838,7 +817,7 @@ end
     (modify 1 ^value checking))
 */
 rule "start_checking"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.MARKING )
     then
@@ -858,7 +837,7 @@ end
     (make illegal ^bp <bp> ^l_id <id>))
 */
 rule "checking1"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.CHECKING )
         $junction : Junction( $basePoint : basePoint, visited == "check" )
@@ -889,7 +868,7 @@ end
     (remove 6))
 */
 rule "remove_label_3j"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.REMOVE_LABEL )
         $illegal : Illegal( $basePoint : basePoint, $labelId : labelId )
@@ -922,7 +901,7 @@ end
     (remove 5))
 */
 rule "remove_edge_2j"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.REMOVE_LABEL )
         $illegal : Illegal( $basePoint : basePoint, $labelId : labelId )
@@ -946,7 +925,7 @@ end
 
 */
 rule "checking2"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.CHECKING )
         $junction : Junction( $basePoint : basePoint, visited == "check" )
@@ -961,7 +940,7 @@ end
     (modify 1 ^value labeling))
 */
 rule "stop_checking"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.CHECKING )
     then
@@ -975,7 +954,7 @@ end
     (modify 1 ^value printing))
 */
 rule "done_labeling"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         $stage : Stage( value == Stage.LABELING )
     then
@@ -990,7 +969,7 @@ end
     (halt))
 */
 rule "done"
-    ruleflow-group "1"
+    agenda-group "1"
     when
         Stage( value == Stage.PRINTING )
     then
