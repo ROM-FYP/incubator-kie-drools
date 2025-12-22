@@ -18,6 +18,18 @@
  */
 package org.drools.benchmark.waltzdb;
 
+import org.drools.core.impl.RuleBaseFactory;
+import org.drools.kiesession.rulebase.InternalKnowledgeBase;
+import org.drools.kiesession.rulebase.KnowledgeBaseFactory;
+import org.drools.util.IoUtils;
+import org.kie.api.KieBaseConfiguration;
+import org.kie.api.definition.KiePackage;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSession;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,110 +39,106 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.drools.kiesession.rulebase.InternalKnowledgeBase;
-import org.drools.core.impl.RuleBaseFactory;
-import org.drools.util.IoUtils;
-import org.drools.kiesession.rulebase.KnowledgeBaseFactory;
-import org.kie.api.KieBaseConfiguration;
-import org.kie.api.definition.KiePackage;
-import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.KieSession;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.io.ResourceFactory;
-
 /**
  * This example is incomplete, it run's, but is no way near correct.
  */
 public class WaltzDbBenchmark {
     public static void main(final String[] args) {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        kbuilder.add( ResourceFactory.newClassPathResource("waltzdb.drl",
-                WaltzDbBenchmark.class),
-                              ResourceType.DRL );
+        kbuilder.add(ResourceFactory.newClassPathResource("waltzdb.drl",
+                        WaltzDbBenchmark.class),
+                ResourceType.DRL);
         Collection<KiePackage> pkgs = kbuilder.getKnowledgePackages();
 
         KieBaseConfiguration kbaseConfiguration = RuleBaseFactory.newKnowledgeBaseConfiguration();
-        kbaseConfiguration.setProperty( "drools.removeIdentities",
-                                        "true" );
+        kbaseConfiguration.setProperty("drools.removeIdentities",
+                "true");
 
         final InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConfiguration);
         //                final RuleBase ruleBase = RuleBaseFactory.newRuleBase( RuleBase.RETEOO,
         //                                                               conf );
+        int iterations = 10;
+        double average_time = 0;
+        KieSession ksession;
+        kbase.addPackages(pkgs);
 
-        kbase.addPackages( pkgs );
 
-        KieSession ksession = kbase.newKieSession();
-
-        List<Line> lines = WaltzDbBenchmark.loadLines( "waltzdb16.dat" ); //12,8,4
-        List<Label> labels = WaltzDbBenchmark.loadLabels( "waltzdb16.dat" ); //12,8,4
-        long now = System.currentTimeMillis();
-        for ( Line line: lines ) {
-            ksession.insert( line );
-            System.out.println( line.getP1() + " " + line.getP2() );
-        }
-        for ( Label label: labels ) {
-            ksession.insert( label );
-            System.out.println( label.getId() + " " + label.getType() );
-        }
-
-        Stage stage = new Stage( Stage.DUPLICATE );
-        ksession.insert( stage );
-        ksession.fireAllRules();
-        System.out.println( "Time: " + (System.currentTimeMillis() - now) );
-        ksession.dispose();
-
-    }
-
-    private static List<Line> loadLines(String filename) {
-        List<Line> result = new ArrayList<>();
-        try {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader( WaltzDbBenchmark.class.getResourceAsStream( "data/" + filename ),
-                                           IoUtils.UTF8_CHARSET ) );
-            Pattern pat = Pattern.compile( ".*make line \\^p1 ([0-9]*) \\^p2 ([0-9]*).*" );
-            String line = reader.readLine();
-            while ( line != null ) {
-                Matcher m = pat.matcher( line );
-                if ( m.matches() ) {
-                    Line l = new Line( Integer.parseInt( m.group( 1 ) ),
-                                       Integer.parseInt( m.group( 2 ) ) );
-                    result.add( l );
-                }
-                line = reader.readLine();
+        List<Line> lines = WaltzDbBenchmark.loadLines("waltzdb16.dat"); //12,8,4
+        List<Label> labels = WaltzDbBenchmark.loadLabels("waltzdb16.dat"); //12,8,4
+        for (int t = 0; t < iterations; t++) {
+            ksession = kbase.newKieSession();
+            long now = System.currentTimeMillis();
+            for (Line line : lines) {
+                ksession.insert(line);
+                System.out.println(line.getP1() + " " + line.getP2());
             }
-            reader.close();
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not read file with filename (" + filename + ").", e);
+            for (Label label : labels) {
+                ksession.insert(label);
+                System.out.println(label.getId() + " " + label.getType());
+            }
+
+            Stage stage = new Stage(Stage.DUPLICATE);
+            ksession.insert(stage);
+            ksession.fireAllRules();
+            average_time += (System.currentTimeMillis() - now);
+            System.out.println("Time: " + (System.currentTimeMillis() - now));
+            ksession.dispose();
+
         }
-        return result;
+        System.out.println( "Average Time: " + (average_time/iterations) );
+
     }
 
-    private static List<Label> loadLabels(String filename) {
-        List<Label> result = new ArrayList<>();
-        try {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader( WaltzDbBenchmark.class.getResourceAsStream( "data/" + filename ),
-                                           IoUtils.UTF8_CHARSET ) );
-            Pattern pat = Pattern.compile( ".*make label \\^type ([0-9a-z]*) \\^name ([0-9a-zA-Z]*) \\^id ([0-9]*) \\^n1 ([B+-]*) \\^n2 ([B+-]*)( \\^n3 ([B+-]*))?.*" );
-            String line = reader.readLine();
-            while ( line != null ) {
-                Matcher m = pat.matcher( line );
-                if ( m.matches() ) {
-                    Label l = new Label( m.group( 1 ),
-                                         m.group( 2 ),
-                                         m.group( 3 ),
-                                         m.group( 4 ),
-                                         m.group( 5 ),
-                                         m.group( 6 ) );
-                    result.add( l );
+
+        private static List<Line> loadLines (String filename){
+            List<Line> result = new ArrayList<>();
+            try {
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(WaltzDbBenchmark.class.getResourceAsStream("data/" + filename),
+                                IoUtils.UTF8_CHARSET));
+                Pattern pat = Pattern.compile(".*make line \\^p1 ([0-9]*) \\^p2 ([0-9]*).*");
+                String line = reader.readLine();
+                while (line != null) {
+                    Matcher m = pat.matcher(line);
+                    if (m.matches()) {
+                        Line l = new Line(Integer.parseInt(m.group(1)),
+                                Integer.parseInt(m.group(2)));
+                        result.add(l);
+                    }
+                    line = reader.readLine();
                 }
-                line = reader.readLine();
+                reader.close();
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Could not read file with filename (" + filename + ").", e);
             }
-            reader.close();
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not read file with filename (" + filename + ").", e);
+            return result;
         }
-        return result;
+
+        private static List<Label> loadLabels (String filename){
+            List<Label> result = new ArrayList<>();
+            try {
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(WaltzDbBenchmark.class.getResourceAsStream("data/" + filename),
+                                IoUtils.UTF8_CHARSET));
+                Pattern pat = Pattern.compile(".*make label \\^type ([0-9a-z]*) \\^name ([0-9a-zA-Z]*) \\^id ([0-9]*) \\^n1 ([B+-]*) \\^n2 ([B+-]*)( \\^n3 ([B+-]*))?.*");
+                String line = reader.readLine();
+                while (line != null) {
+                    Matcher m = pat.matcher(line);
+                    if (m.matches()) {
+                        Label l = new Label(m.group(1),
+                                m.group(2),
+                                m.group(3),
+                                m.group(4),
+                                m.group(5),
+                                m.group(6));
+                        result.add(l);
+                    }
+                    line = reader.readLine();
+                }
+                reader.close();
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Could not read file with filename (" + filename + ").", e);
+            }
+            return result;
+        }
     }
-}
