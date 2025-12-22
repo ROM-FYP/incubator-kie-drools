@@ -39,6 +39,15 @@ import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * This example is incomplete, it run's, but is no way near correct.
  */
@@ -57,33 +66,34 @@ public class WaltzDbBenchmark {
         final InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConfiguration);
         //                final RuleBase ruleBase = RuleBaseFactory.newRuleBase( RuleBase.RETEOO,
         //                                                               conf );
-        int iterations =100;
-        double average_time =0;
+        int iterations = 100;
+        double average_time = 0;
         KieSession ksession;
-        kbase.addPackages( pkgs );
+        kbase.addPackages(pkgs);
 
 
-        List<Line> lines = WaltzDbBenchmark.loadLines( "waltzdb16.dat" ); //12,8,4
-        List<Label> labels = WaltzDbBenchmark.loadLabels( "waltzdb16.dat" ); //12,8,4
-        for (int t=0;t<iterations;t++){
+        List<Line> lines = WaltzDbBenchmark.loadLines("waltzdb16.dat"); //12,8,4
+        List<Label> labels = WaltzDbBenchmark.loadLabels("waltzdb16.dat"); //12,8,4
+        for (int t = 0; t < iterations; t++) {
             ksession = kbase.newKieSession();
             long now = System.currentTimeMillis();
-            System.out.println( "Iteration: " + t );
-        for ( Line line: lines ) {
-            ksession.insert( line );
-            System.out.println( line.getP1() + " " + line.getP2() );
-        }
-        for ( Label label: labels ) {
-            ksession.insert( label );
-            System.out.println( label.getId() + " " + label.getType() );
-        }
+            for (Line line : lines) {
+                ksession.insert(line);
+                //System.out.println(line.getP1() + " " + line.getP2());
+            }
+            for (Label label : labels) {
+                ksession.insert(label);
+                //System.out.println(label.getId() + " " + label.getType());
+            }
 
-        Stage stage = new Stage( Stage.DUPLICATE );
-        ksession.insert( stage );
-        ksession.fireAllRules();
-        System.out.println( "Time: " + (System.currentTimeMillis() - now) );
-            average_time += (System.currentTimeMillis() - now);
+            Stage stage = new Stage(Stage.DUPLICATE);
+            ksession.insert(stage);
+            ksession.fireAllRules();
+            long time = System.currentTimeMillis() - now;
+            average_time += time;
+            System.out.println("Iteration " + (t+1) + " of " + iterations + " finished in " + time + "ms");
             ksession.dispose();
+
         }
         System.out.println( "Average Time: " + (average_time/iterations) );
 
