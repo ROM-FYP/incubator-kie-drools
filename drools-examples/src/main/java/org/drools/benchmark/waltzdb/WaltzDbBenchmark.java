@@ -66,7 +66,7 @@ public class WaltzDbBenchmark {
         final InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConfiguration);
         //                final RuleBase ruleBase = RuleBaseFactory.newRuleBase( RuleBase.RETEOO,
         //                                                               conf );
-        int iterations = 100;
+        int iterations = 10;
         double average_time = 0;
         KieSession ksession;
         kbase.addPackages(pkgs);
@@ -88,6 +88,8 @@ public class WaltzDbBenchmark {
 
             Stage stage = new Stage(Stage.DUPLICATE);
             ksession.insert(stage);
+            ksession.getAgenda().getAgendaGroup("1").setFocus(); // Bottom of stack
+            ksession.getAgenda().getAgendaGroup("2").setFocus();
             ksession.fireAllRules();
             long time = System.currentTimeMillis() - now;
             average_time += time;

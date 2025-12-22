@@ -28,28 +28,29 @@ import org.drools.benchmark.waltzdb.Junction;
 import org.drools.benchmark.waltzdb.Label;
 import org.drools.benchmark.waltzdb.Illegal;
 import org.drools.benchmark.waltzdb.ClusterAware;
-
-rule "Switch to Group 1"
-    when
-        $count : Number( intValue >= 10 ) from accumulate(
-            $c : ClusterAware( clusterId == "1" ) over window:length(10),
-            count(1)
-        )
-    then
-        ((org.kie.api.runtime.rule.Agenda) kcontext.getKnowledgeRuntime().getAgenda()).activateRuleFlowGroup("1");
-        System.out.println("Context Switched to Group 1 due to high event density (count=" + $count + ")");
-end
-
-rule "Switch to Group 2"
-    when
-        $count : Number( intValue >= 10 ) from accumulate(
-            $c : ClusterAware( clusterId == "2" ) over window:length(10),
-            count(1)
-        )
-    then
-        ((org.kie.api.runtime.rule.Agenda) kcontext.getKnowledgeRuntime().getAgenda()).activateRuleFlowGroup("2");
-        System.out.println("Context Switched to Group 2 due to high event density (count=" + $count + ")");
-end
+/*
+//rule "Switch to Group 1"
+//    when
+//        $count : Number( intValue >= 10 ) from accumulate(
+//            $c : ClusterAware( clusterId == "1" ) over window:length(10),
+//            count(1)
+//        )
+//    then
+//        ((org.kie.api.runtime.rule.Agenda) kcontext.getKnowledgeRuntime().getAgenda()).activateRuleFlowGroup("1");
+//       System.out.println("Context Switched to Group 1 due to high event density (count=" + $count + ")");
+//end
+//
+//rule "Switch to Group 2"
+//    when
+//        $count : Number( intValue >= 10 ) from accumulate(
+//            $c : ClusterAware( clusterId == "2" ) over window:length(10),
+//            count(1)
+//        )
+//  then
+//        ((org.kie.api.runtime.rule.Agenda) kcontext.getKnowledgeRuntime().getAgenda()).activateRuleFlowGroup("2");
+//        System.out.println("Context Switched to Group 2 due to high event density (count=" + $count + ")");
+//end
+*/
 
 /*
 // Reverse the edges
