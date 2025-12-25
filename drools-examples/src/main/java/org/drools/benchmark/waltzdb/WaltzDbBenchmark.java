@@ -76,7 +76,7 @@ public class WaltzDbBenchmark {
         List<Label> labels = WaltzDbBenchmark.loadLabels("waltzdb16.dat"); //12,8,4
         for (int t = 0; t < iterations; t++) {
             ksession = kbase.newKieSession();
-            long now = System.currentTimeMillis();
+
             for (Line line : lines) {
                 ksession.insert(line);
                 //System.out.println(line.getP1() + " " + line.getP2());
@@ -88,6 +88,7 @@ public class WaltzDbBenchmark {
 
             Stage stage = new Stage(Stage.DUPLICATE);
             ksession.insert(stage);
+            long now = System.currentTimeMillis();
             ksession.getAgenda().getAgendaGroup("1").setFocus(); // Bottom of stack
             ksession.getAgenda().getAgendaGroup("2").setFocus();
             ksession.fireAllRules();
