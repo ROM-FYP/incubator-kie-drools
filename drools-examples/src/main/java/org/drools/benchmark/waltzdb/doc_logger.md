@@ -30,6 +30,20 @@ First, generate the classpath file. This only needs to be done once (or when dep
 mvn dependency:build-classpath -pl drools-examples -Dmdep.outputFile=cp.txt
 ```
 
+Windows / PowerShell note: the mvn command is the same on Windows. The produced cp.txt is consumed differently in PowerShell because Windows uses ';' as the classpath separator.
+
+PowerShell (Windows) - read cp and run Java (examples below show how to use the cp file in PowerShell):
+```powershell
+# from project root
+mvn dependency:build-classpath -pl drools-examples -Dmdep.outputFile=cp.txt
+
+# read entire cp.txt into a single string
+$cp = Get-Content .\drools-examples\cp.txt -Raw
+
+# combine with local classes folder using Windows separator ';'
+java -cp "$cp;drools-examples\target\classes" -Dmining.trace=true org.drools.benchmark.waltzdb.WaltzDbBenchmark
+```
+
 ### 2. Run with Logging Enabled
 To enable the logger, pass the system property `-Dmining.trace=true`.
 
@@ -37,11 +51,24 @@ To enable the logger, pass the system property `-Dmining.trace=true`.
 java -cp $(cat drools-examples/cp.txt):drools-examples/target/classes -Dmining.trace=true org.drools.benchmark.waltzdb.WaltzDbBenchmark
 ```
 
+PowerShell / Windows equivalent:
+```powershell
+# ensure you're in project root
+$cp = Get-Content .\drools-examples\cp.txt -Raw
+java -cp "$cp;drools-examples\target\classes" -Dmining.trace=true org.drools.benchmark.waltzdb.WaltzDbBenchmark
+```
+
 ### 3. Run with Logging Disabled (Default)
 To run without logging, simply omit the system property.
 
 ```bash
 java -cp $(cat drools-examples/cp.txt):drools-examples/target/classes org.drools.benchmark.waltzdb.WaltzDbBenchmark
+```
+
+PowerShell / Windows equivalent:
+```powershell
+$cp = Get-Content .\drools-examples\cp.txt -Raw
+java -cp "$cp;drools-examples\target\classes" org.drools.benchmark.waltzdb.WaltzDbBenchmark
 ```
 
 **Output:**
@@ -53,4 +80,3 @@ CaseID,SequenceNr,Activity,Timestamp
 1,1,reverse_edges,1768418320292
 ...
 ```
-

@@ -36,6 +36,6 @@ dependency-reduced-pom.xml
 
 #CI
 !.ci
-
+waltzdb_trace.csv
 # Claude Code project documentation
 CLAUDE.md
