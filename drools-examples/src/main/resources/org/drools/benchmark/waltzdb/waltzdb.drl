@@ -38,6 +38,7 @@ import org.drools.benchmark.waltzdb.Illegal;
 //    (remove 2))
 */
 rule "reverse_edges"
+    agenda-group "5"
     when
         Stage( value == Stage.DUPLICATE )
         $line : Line( $p1:p1, $p2:p2 )
@@ -55,6 +56,7 @@ end
 //    -->
 //    (modify 1 ^value detect_junctions))
 rule "done_reversing"
+        agenda-group "5"
     when
         $stage : Stage( value == Stage.DUPLICATE )
         not ( Line( ) )
@@ -80,6 +82,8 @@ end
     (modify 4 ^type 3j ^joined true))
 */
 rule "make_3_junction"
+    agenda-group "5"
+
     when
         Stage( value == Stage.DETECT_JUNCTIONS )
         $edge1 : Edge( $basePoint : p1, $p1 : p2, joined == false )
@@ -112,6 +116,8 @@ end
 
 */
 rule "make_L"
+    agenda-group "5"
+
     when
         Stage( value == Stage.DETECT_JUNCTIONS )
         $edge1 : Edge( $basePoint : p1, $p2 : p2, joined == false )
@@ -134,6 +140,8 @@ end
 
 */
 rule "done_detecting"
+    agenda-group "5"
+
     when
         $stage : Stage( value == Stage.DETECT_JUNCTIONS )
         not( Edge ( joined == false ) )
@@ -156,6 +164,8 @@ end
     (modify 1 ^value find_second_boundary))
 */
 rule "initial_boundary_junction_L"
+    agenda-group "5"
+
     when
         $stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
         $junction : Junction( type == "2j", $basePoint : basePoint, $p1 : p1, $p2 : p2 )
@@ -187,6 +197,8 @@ end
 
 */
 rule "initial_boundary_junction_arrow"
+    agenda-group "5"
+
     when
         $stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
         $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
@@ -219,6 +231,8 @@ end
 
 */
 rule "second_boundary_junction_L"
+    agenda-group "5"
+
     when
         $stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
         $junction : Junction( type == "2j", $basePoint : basePoint, $p1 : p1, $p2 : p2 )
@@ -251,6 +265,8 @@ end
 
 */
 rule "second_boundary_junction_arrow"
+    agenda-group "5"
+
     when
         $stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
         $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
@@ -277,6 +293,8 @@ end
 
 */
 rule "start_visit_3_junction"
+    agenda-group "2"
+
     when
         $stage : Stage( value == Stage.LABELING )
         $junction : Junction( type == "3j", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "no" )
@@ -305,6 +323,8 @@ end
 
 */
 rule "visit_3j_0"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -342,6 +362,8 @@ end
 
 */
 rule "visit_3j_1"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -379,6 +401,8 @@ end
 
 */
 rule "visit_3j_2"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -416,6 +440,8 @@ end
 
 */
 rule "visit_3j_3"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -453,6 +479,8 @@ end
 
 */
 rule "visit_3j_4"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -490,6 +518,8 @@ end
 
 */
 rule "visit_3j_5"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -527,6 +557,8 @@ end
 
 */
 rule "visit_3j_6"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -564,6 +596,8 @@ end
 
 */
 rule "visit_3j_7"
+    agenda-group "2"
+
     when
         Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
@@ -592,6 +626,7 @@ end
 
 */
 rule "start_visit_2_junction"
+    agenda-group "3"
     when
         $stage : Stage( value == Stage.LABELING )
         $junction : Junction( $basePoint : basePoint, type == "2j", $p1 : p1, $p2 : p2, visited == "no" )
@@ -619,6 +654,8 @@ end
 
 */
 rule "visit_2j_0"
+    agenda-group "3"
+
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -650,6 +687,8 @@ end
 
 */
 rule "visit_2j_1"
+    agenda-group "3"
+
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -681,6 +720,8 @@ end
 
 */
 rule "visit_2j_2"
+    agenda-group "3"
+
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -713,6 +754,8 @@ end
 
 */
 rule "visit_2j_3"
+    agenda-group "3"
+
     when
         Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
@@ -737,6 +780,8 @@ end
 
 */
 rule "end_visit"
+    agenda-group "4"
+
     when
         $stage : ( Stage( value == Stage.VISITING_2J ) or Stage( value == Stage.VISITING_3J ) )
         $junction : Junction( visited == "now" )
@@ -755,6 +800,8 @@ end
 
 */
 rule "marking"
+    agenda-group "4"
+
     when
         Stage( value == Stage.MARKING )
         Junction( $basePoint : basePoint, visited == "now" )
@@ -773,6 +820,8 @@ end
     (modify 2 ^visited yes))
 */
 rule "stop_marking"
+    agenda-group "4"
+
     when
         Stage( value == Stage.MARKING )
         $junction : Junction( $basePoint : basePoint, visited == "now" )
@@ -787,6 +836,8 @@ end
     (modify 1 ^value checking))
 */
 rule "start_checking"
+    agenda-group "4"
+
     when
         $stage : Stage( value == Stage.MARKING )
     then
@@ -806,6 +857,8 @@ end
     (make illegal ^bp <bp> ^l_id <id>))
 */
 rule "checking1"
+    agenda-group "1"
+
     when
         $stage : Stage( value == Stage.CHECKING )
         $junction : Junction( $basePoint : basePoint, visited == "check" )
@@ -836,6 +889,8 @@ end
     (remove 6))
 */
 rule "remove_label_3j"
+    agenda-group "1"
+
     when
         $stage : Stage( value == Stage.REMOVE_LABEL )
         $illegal : Illegal( $basePoint : basePoint, $labelId : labelId )
@@ -868,6 +923,8 @@ end
     (remove 5))
 */
 rule "remove_edge_2j"
+    agenda-group "1"
+
     when
         $stage : Stage( value == Stage.REMOVE_LABEL )
         $illegal : Illegal( $basePoint : basePoint, $labelId : labelId )
@@ -891,6 +948,8 @@ end
 
 */
 rule "checking2"
+    agenda-group "3"
+
     when
         Stage( value == Stage.CHECKING )
         $junction : Junction( $basePoint : basePoint, visited == "check" )
@@ -905,6 +964,8 @@ end
     (modify 1 ^value labeling))
 */
 rule "stop_checking"
+    agenda-group "3"
+
     when
         $stage : Stage( value == Stage.CHECKING )
     then
@@ -918,6 +979,8 @@ end
     (modify 1 ^value printing))
 */
 rule "done_labeling"
+    agenda-group "3"
+
     when
         $stage : Stage( value == Stage.LABELING )
     then
@@ -932,6 +995,8 @@ end
     (halt))
 */
 rule "done"
+    agenda-group "3"
+
     when
         Stage( value == Stage.PRINTING )
     then
