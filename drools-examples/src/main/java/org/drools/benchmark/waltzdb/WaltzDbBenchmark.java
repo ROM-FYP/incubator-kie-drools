@@ -71,11 +71,6 @@ public class WaltzDbBenchmark {
         List<Label> labels = WaltzDbBenchmark.loadLabels("waltzdb16.dat"); // 12,8,4
         for (int t = 0; t < iterations; t++) {
             ksession = kbase.newKieSession();
-            if (logger != null) {
-                ksession.addEventListener(logger);
-                logger.startNewTransaction();
-            }
-            long now = System.currentTimeMillis();
             for (Line line : lines) {
                 ksession.insert(line);
                 System.out.println(line.getP1() + " " + line.getP2());
@@ -87,9 +82,16 @@ public class WaltzDbBenchmark {
 
             Stage stage = new Stage(Stage.DUPLICATE);
             ksession.insert(stage);
+            long now = System.currentTimeMillis();
+            ksession.getAgenda().getAgendaGroup("1").setFocus();// Bottom of stack
+            ksession.getAgenda().getAgendaGroup("2").setFocus();
+            ksession.getAgenda().getAgendaGroup("3").setFocus();
+            ksession.getAgenda().getAgendaGroup("4").setFocus();
+            ksession.getAgenda().getAgendaGroup("5").setFocus();
             ksession.fireAllRules();
-            average_time += (System.currentTimeMillis() - now);
-            System.out.println("Time: " + (System.currentTimeMillis() - now));
+            long time = System.currentTimeMillis() - now;
+            average_time += time;
+            System.out.println("Iteration " + (t+1) + " of " + iterations + " finished in " + time + "ms");
             ksession.dispose();
 
         }
