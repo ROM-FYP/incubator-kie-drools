@@ -48,6 +48,11 @@ public class WaltzDbBenchmark {
         kbuilder.add(ResourceFactory.newClassPathResource("waltzdb.drl",
                 WaltzDbBenchmark.class),
                 ResourceType.DRL);
+        if (kbuilder.hasErrors()) {
+            System.err.println(kbuilder.getErrors().toString());
+            throw new IllegalStateException("DRL has errors");
+        }
+
         Collection<KiePackage> pkgs = kbuilder.getKnowledgePackages();
 
         KieBaseConfiguration kbaseConfiguration = RuleBaseFactory.newKnowledgeBaseConfiguration();
@@ -85,11 +90,19 @@ public class WaltzDbBenchmark {
             Stage stage = new Stage(Stage.DUPLICATE);
             ksession.insert(stage);
             long now = System.currentTimeMillis();
-            ksession.getAgenda().getAgendaGroup("1").setFocus();// Bottom of stack
-            ksession.getAgenda().getAgendaGroup("2").setFocus();
-            ksession.getAgenda().getAgendaGroup("3").setFocus();
-            ksession.getAgenda().getAgendaGroup("4").setFocus();
-            ksession.getAgenda().getAgendaGroup("5").setFocus();
+//            ksession.getAgenda().getAgendaGroup("10").setFocus();// Bottom of stack
+//            ksession.getAgenda().getAgendaGroup("9").setFocus();
+//            ksession.getAgenda().getAgendaGroup("8").setFocus();
+//            ksession.getAgenda().getAgendaGroup("7").setFocus();
+//            ksession.getAgenda().getAgendaGroup("6").setFocus();
+//            ksession.getAgenda().getAgendaGroup("5").setFocus();
+//            ksession.getAgenda().getAgendaGroup("4").setFocus();
+//            ksession.getAgenda().getAgendaGroup("3").setFocus();
+//            ksession.getAgenda().getAgendaGroup("2").setFocus();
+//            ksession.getAgenda().getAgendaGroup("1").setFocus();
+//            ksession.getAgenda().getAgendaGroup("0").setFocus();
+
+
             ksession.fireAllRules();
             long time = System.currentTimeMillis() - now;
             average_time += time;

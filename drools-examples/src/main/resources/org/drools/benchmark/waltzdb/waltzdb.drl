@@ -38,9 +38,9 @@ import org.drools.benchmark.waltzdb.Illegal;
 //    (remove 2))
 */
 rule "reverse_edges"
-    agenda-group "MAIN"
+    //agenda-group "0"
     when
-        Stage( value == Stage.DUPLICATE )
+        //Stage( value == Stage.DUPLICATE )
         $line : Line( $p1:p1, $p2:p2 )
     then
         System.out.println( "Edge " + $p1 + " " + $p2 );
@@ -56,12 +56,12 @@ end
 //    -->
 //    (modify 1 ^value detect_junctions))
 rule "done_reversing"
-        agenda-group "MAIN"
     when
-        $stage : Stage( value == Stage.DUPLICATE )
+        //$stage : Stage( value == Stage.DUPLICATE )
         not ( Line( ) )
     then
-        modify( $stage ) {setValue( Stage.DETECT_JUNCTIONS )}
+        //modify( $stage ) {setValue( Stage.DETECT_JUNCTIONS )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("1").setFocus();
         System.out.println( "Stage.DETECT_JUNCTIONS" );
 end
 
@@ -82,10 +82,10 @@ end
     (modify 4 ^type 3j ^joined true))
 */
 rule "make_3_junction"
-    agenda-group "4"
+    agenda-group "1"
 
     when
-        Stage( value == Stage.DETECT_JUNCTIONS )
+        //Stage( value == Stage.DETECT_JUNCTIONS )
         $edge1 : Edge( $basePoint : p1, $p1 : p2, joined == false )
         $edge2 : Edge( p1 == $basePoint, $p2 : p2 != $p1, joined == false )
         $edge3 : Edge( p1 == $basePoint, $p3 : p2 != $p1, p2 != $p2, joined == false )
@@ -116,10 +116,10 @@ end
 
 */
 rule "make_L"
-    agenda-group "4"
+    agenda-group "1"
 
     when
-        Stage( value == Stage.DETECT_JUNCTIONS )
+        //Stage( value == Stage.DETECT_JUNCTIONS )
         $edge1 : Edge( $basePoint : p1, $p2 : p2, joined == false )
         $edge2 : Edge( p1 == $basePoint, $p3 : p2 != $p2, joined == false )
         not( Edge( p1 == $basePoint, p2 != $p2, p2 != $p3 ) )
@@ -140,13 +140,14 @@ end
 
 */
 rule "done_detecting"
-    agenda-group "4"
+    agenda-group "1"
 
     when
-        $stage : Stage( value == Stage.DETECT_JUNCTIONS )
+       // $stage : Stage( value == Stage.DETECT_JUNCTIONS )
         not( Edge ( joined == false ) )
     then
-        modify( $stage ) {setValue( Stage.FIND_INITIAL_BOUNDARY )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("2").setFocus();
+        //modify( $stage ) {setValue( Stage.FIND_INITIAL_BOUNDARY )}
         System.out.println( "Stage: FIND_INITIAL_BOUNDARY" );
 end
 
@@ -164,10 +165,10 @@ end
     (modify 1 ^value find_second_boundary))
 */
 rule "initial_boundary_junction_L"
-    agenda-group "3"
+    agenda-group "2"
 
     when
-        $stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
+        //$stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
         $junction : Junction( type == "2j", $basePoint : basePoint, $p1 : p1, $p2 : p2 )
         Edge( p1 == $basePoint, p2 == $p1 )
         Edge( p1 == $basePoint, p2 == $p2 )
@@ -176,7 +177,8 @@ rule "initial_boundary_junction_L"
         modify( $junction ) {setVisited( "yes" )}
         insert( new EdgeLabel( $basePoint, $p1, "B", "1" ) );
         insert( new EdgeLabel( $basePoint, $p2, "B", "1" ) );
-        modify( $stage ) {setValue( Stage.FIND_SECOND_BOUDARY )}
+        //modify( $stage ) {setValue( Stage.FIND_SECOND_BOUDARY )}
+         drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("3").setFocus();
         System.out.println( "Stage.FIND_SECOND_BOUDARY" );
 end
 /*
@@ -197,10 +199,10 @@ end
 
 */
 rule "initial_boundary_junction_arrow"
-    agenda-group "3"
+    agenda-group "2"
 
     when
-        $stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
+        //$stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
         $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
         $edge1 : Edge( p1 == $basePoint, p2 == $p1 )
         $edge2 : Edge( p1 == $basePoint, p2 == $p2 )
@@ -211,7 +213,8 @@ rule "initial_boundary_junction_arrow"
         insert( new EdgeLabel( $basePoint, $p1, "B", "14" ) );
         insert( new EdgeLabel( $basePoint, $p2, "+", "14" ) );
         insert( new EdgeLabel( $basePoint, $p3, "B", "14" ) );
-        modify( $stage ) {setValue( Stage.FIND_SECOND_BOUDARY )}
+        //modify( $stage ) {setValue( Stage.FIND_SECOND_BOUDARY )}
+         drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("3").setFocus();
         System.out.println( "Stage.FIND_SECOND_BOUDARY" );
 end
 
@@ -234,7 +237,7 @@ rule "second_boundary_junction_L"
     agenda-group "3"
 
     when
-        $stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
+        //$stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
         $junction : Junction( type == "2j", $basePoint : basePoint, $p1 : p1, $p2 : p2 )
         Edge( p1 == $basePoint, p2 == $p1)
         Edge( p1 == $basePoint, p2 == $p2)
@@ -243,7 +246,8 @@ rule "second_boundary_junction_L"
         modify( $junction ) {setVisited( "yes" )}
         insert( new EdgeLabel( $basePoint, $p1, "B", "1" ) );
         insert( new EdgeLabel($basePoint, $p2, "B", "1" ) );
-        modify( $stage ) {setValue( Stage.LABELING )}
+        //modify( $stage ) {setValue( Stage.LABELING )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("4").setFocus();
         System.out.println( "Stage.LABELING" );
 end
 
@@ -268,7 +272,7 @@ rule "second_boundary_junction_arrow"
     agenda-group "3"
 
     when
-        $stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
+        //$stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
         $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
         Edge( p1 == $basePoint, p2 == $p1 )
         Edge( p1 == $basePoint, p2 == $p2 )
@@ -279,7 +283,8 @@ rule "second_boundary_junction_arrow"
         insert( new EdgeLabel( $basePoint, $p1, "B", "14" ) );
         insert( new EdgeLabel( $basePoint, $p2, "+", "14" ) );
         insert( new EdgeLabel( $basePoint, $p3, "B", "14" ) );
-        modify( $stage ) {setValue( Stage.LABELING )}
+        //modify( $stage ) {setValue( Stage.LABELING )}
+         drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("4").setFocus();
         System.out.println( "Stage.LABELING" );
 end
 
@@ -293,13 +298,14 @@ end
 
 */
 rule "start_visit_3_junction"
-    agenda-group "2"
+    agenda-group "4"
 
     when
-        $stage : Stage( value == Stage.LABELING )
+        //$stage : Stage( value == Stage.LABELING )
         $junction : Junction( type == "3j", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "no" )
     then
-        modify( $stage ) {setValue( Stage.VISITING_3J )}
+        //modify( $stage ) {setValue( Stage.VISITING_3J )}
+         drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("5").setFocus();
         modify( $junction ) {setVisited( "now" )}
         System.out.println( "Stage.VISITING_3J" );
 end
@@ -323,10 +329,10 @@ end
 
 */
 rule "visit_3j_0"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+       // Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label(type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         EdgeLabel( p1 == $p1, p2 == $basePoint, labelName == $n1 )
@@ -362,10 +368,10 @@ end
 
 */
 rule "visit_3j_1"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+        //Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         not ( EdgeLabel( p1 == $p1, p2 == $basePoint ) )
@@ -401,10 +407,10 @@ end
 
 */
 rule "visit_3j_2"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+        //Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         EdgeLabel( p1 == $p1, p2 == $basePoint, labelName == $n1 )
@@ -440,10 +446,10 @@ end
 
 */
 rule "visit_3j_3"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+        //Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         not ( EdgeLabel( p1 == $p1, p2 == $basePoint ) )
@@ -479,10 +485,10 @@ end
 
 */
 rule "visit_3j_4"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+        //Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         EdgeLabel( p1 == $p1, p2 == $basePoint, labelName == $n1 )
@@ -518,10 +524,10 @@ end
 
 */
 rule "visit_3j_5"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+        //Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label(type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         not ( EdgeLabel( p1 == $p1, p2 == $basePoint ) )
@@ -557,10 +563,10 @@ end
 
 */
 rule "visit_3j_6"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+        //Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         EdgeLabel( p1 == $p1, p2 == $basePoint, labelName == $n1 )
@@ -596,10 +602,10 @@ end
 
 */
 rule "visit_3j_7"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        Stage( value == Stage.VISITING_3J )
+        //Stage( value == Stage.VISITING_3J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2, $n3 : n3 )
         not ( EdgeLabel( p1 == $p1, p2 == $basePoint ) )
@@ -626,12 +632,13 @@ end
 
 */
 rule "start_visit_2_junction"
-    agenda-group "2"
+    agenda-group "4"
     when
-        $stage : Stage( value == Stage.LABELING )
+        //$stage : Stage( value == Stage.LABELING )
         $junction : Junction( $basePoint : basePoint, type == "2j", $p1 : p1, $p2 : p2, visited == "no" )
     then
-        modify( $stage ) {setValue( Stage.VISITING_2J )}
+        //modify( $stage ) {setValue( Stage.VISITING_2J )}
+         drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("6").setFocus();
         System.out.println( "Stage.VISITING_2J" );
         modify( $junction ) {setVisited( "now" )}
 end
@@ -654,10 +661,10 @@ end
 
 */
 rule "visit_2j_0"
-    agenda-group "2"
+    agenda-group "6"
 
     when
-        Stage( value == Stage.VISITING_2J )
+        //Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
         Label(type == $type, $id : id, $n1 : n1, $n2 : n2 )
         EdgeLabel( p1 == $p1, p2 == $basePoint, labelName == $n1 )
@@ -687,10 +694,10 @@ end
 
 */
 rule "visit_2j_1"
-    agenda-group "2"
+    agenda-group "6"
 
     when
-        Stage( value == Stage.VISITING_2J )
+        //Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2 )
         not ( EdgeLabel( p1 == $p1, p2 == $basePoint ) )
@@ -720,10 +727,10 @@ end
 
 */
 rule "visit_2j_2"
-    agenda-group "2"
+    agenda-group "6"
 
     when
-        Stage( value == Stage.VISITING_2J )
+        //Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
         Label( type == $type, $id : id, $n1 : n1, $n2 : n2 )
         EdgeLabel( p1 == $p1, p2 == $basePoint, labelName == $n1 )
@@ -754,10 +761,10 @@ end
 
 */
 rule "visit_2j_3"
-    agenda-group "2"
+    agenda-group "6"
 
     when
-        Stage( value == Stage.VISITING_2J )
+        //Stage( value == Stage.VISITING_2J )
         Junction( $type : type, $basePoint : basePoint, $p1 : p1, $p2 : p2, visited == "now" )
         Label(type == $type, $id : id, $n1 : n1, $n2 : n2 )
         not ( EdgeLabel( p1 == $p1, p2 == $basePoint ) )
@@ -780,13 +787,26 @@ end
 
 */
 rule "end_visit"
-    agenda-group "2"
+    agenda-group "5"
 
     when
-        $stage : ( Stage( value == Stage.VISITING_2J ) or Stage( value == Stage.VISITING_3J ) )
+        //$stage : ( Stage( value == Stage.VISITING_2J ) or Stage( value == Stage.VISITING_3J ) )
         $junction : Junction( visited == "now" )
     then
-        modify( $stage ) {setValue( Stage.MARKING )}
+        //modify( $stage ) {setValue( Stage.MARKING )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("7").setFocus();
+        System.out.println( "Stage.MARKING" );
+end
+
+rule "end_visit2"
+    agenda-group "6"
+
+    when
+        //$stage : ( Stage( value == Stage.VISITING_2J ) or Stage( value == Stage.VISITING_3J ) )
+        $junction : Junction( visited == "now" )
+    then
+        //modify( $stage ) {setValue( Stage.MARKING )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("7").setFocus();
         System.out.println( "Stage.MARKING" );
 end
 /*
@@ -800,10 +820,10 @@ end
 
 */
 rule "marking"
-    agenda-group "2"
+    agenda-group "7"
 
     when
-        Stage( value == Stage.MARKING )
+        //Stage( value == Stage.MARKING )
         Junction( $basePoint : basePoint, visited == "now" )
         Edge( $p1 : p1, p2 == $basePoint )
         $junction : Junction( basePoint == $p1, visited == "yes" )
@@ -820,10 +840,10 @@ end
     (modify 2 ^visited yes))
 */
 rule "stop_marking"
-    agenda-group "2"
+    agenda-group "7"
 
     when
-        Stage( value == Stage.MARKING )
+        //Stage( value == Stage.MARKING )
         $junction : Junction( $basePoint : basePoint, visited == "now" )
     then
         modify( $junction ) {setVisited( "yes" )}
@@ -836,12 +856,14 @@ end
     (modify 1 ^value checking))
 */
 rule "start_checking"
-    agenda-group "2"
+    agenda-group "7"
 
     when
-        $stage : Stage( value == Stage.MARKING )
+        //$stage : Stage( value == Stage.MARKING )
+        not ( Junction( visited == "now" ) )
     then
-        modify( $stage ) {setValue( Stage.CHECKING )}
+        //modify( $stage ) {setValue( Stage.CHECKING )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("8").setFocus();
         System.out.println( "Stage.CHECKING" );
 end
 
@@ -857,16 +879,18 @@ end
     (make illegal ^bp <bp> ^l_id <id>))
 */
 rule "checking1"
-    agenda-group "2"
+    agenda-group "8"
 
     when
-        $stage : Stage( value == Stage.CHECKING )
+        //$stage : Stage( value == Stage.CHECKING )
         $junction : Junction( $basePoint : basePoint, visited == "check" )
         EdgeLabel( p1 == $basePoint, $p2 : p2, $labelName : labelName, $labelId : labelId )
         Junction( basePoint == $p2, visited == "yes" )
         not ( EdgeLabel( p1 == $p2, p2 == $basePoint, labelName == $labelName ) )
     then
-        modify( $stage ) {setValue( Stage.REMOVE_LABEL )}
+        //modify( $stage ) {setValue( Stage.REMOVE_LABEL )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("9").setFocus();
+
         System.out.println( "Stage.REMOVE_LABEL" );
         insert ( new Illegal( $basePoint, $labelId ) );
 end
@@ -889,17 +913,19 @@ end
     (remove 6))
 */
 rule "remove_label_3j"
-    agenda-group "2"
+    agenda-group "9"
 
     when
-        $stage : Stage( value == Stage.REMOVE_LABEL )
+        //$stage : Stage( value == Stage.REMOVE_LABEL )
         $illegal : Illegal( $basePoint : basePoint, $labelId : labelId )
         Junction( type == "3j", basePoint == $basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
         $edgeLabel1 : EdgeLabel( p1 == $basePoint, p2 == $p1, labelId == $labelId )
         $edgeLabel2 : EdgeLabel( p1 == $basePoint, p2 == $p2, labelId == $labelId )
         $edgeLabel3 : EdgeLabel( p1 == $basePoint, p2 == $p3, labelId == $labelId )
     then
-        modify( $stage ) {setValue( Stage.CHECKING )}
+        //modify( $stage ) {setValue( Stage.CHECKING )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("8").setFocus();
+
         System.out.println( "Stage.CHECKING" );
         delete( $illegal );
         delete( $edgeLabel1 );
@@ -923,16 +949,18 @@ end
     (remove 5))
 */
 rule "remove_edge_2j"
-    agenda-group "2"
+    agenda-group "9"
 
     when
-        $stage : Stage( value == Stage.REMOVE_LABEL )
+        //$stage : Stage( value == Stage.REMOVE_LABEL )
         $illegal : Illegal( $basePoint : basePoint, $labelId : labelId )
         Junction( type == "2j", basePoint == $basePoint,$p1 : p1, $p2 : p2 )
         $edgeLabel1 : EdgeLabel( p1 == $basePoint, p2 == $p1, labelId == $labelId )
         $edgeLabel2 : EdgeLabel( p1 == $basePoint, p2 == $p2, labelId == $labelId )
     then
-        modify( $stage ) {setValue( Stage.CHECKING )}
+       // modify( $stage ) {setValue( Stage.CHECKING )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("8").setFocus();
+
         System.out.println( "Stage.CHECKING" );
         delete( $illegal );
         delete( $edgeLabel1 );
@@ -948,10 +976,10 @@ end
 
 */
 rule "checking2"
-    agenda-group "2"
+    agenda-group "8"
 
     when
-        Stage( value == Stage.CHECKING )
+        //Stage( value == Stage.CHECKING )
         $junction : Junction( $basePoint : basePoint, visited == "check" )
     then
         modify( $junction ) {setVisited( "yes" )}
@@ -964,12 +992,14 @@ end
     (modify 1 ^value labeling))
 */
 rule "stop_checking"
-    agenda-group "2"
+    agenda-group "8"
 
     when
-        $stage : Stage( value == Stage.CHECKING )
+        //$stage : Stage( value == Stage.CHECKING )
+        not ( Junction( visited == "check" ) )
     then
-        modify( $stage ) {setValue( Stage.LABELING )}
+        //modify( $stage ) {setValue( Stage.LABELING )}
+        drools.getKnowledgeRuntime().getAgenda().getAgendaGroup("10").setFocus();
         System.out.println( "Stage.LABELING" );
 end
 /*
@@ -979,13 +1009,15 @@ end
     (modify 1 ^value printing))
 */
 rule "done_labeling"
-    agenda-group "2"
+    agenda-group "10"
 
     when
-        $stage : Stage( value == Stage.LABELING )
+        //$stage : Stage( value == Stage.LABELING )
+         not ( Junction( visited == "no" ) )
     then
-        modify( $stage ) {setValue( Stage.PRINTING )}
+        //modify( $stage ) {setValue( Stage.PRINTING )}
         System.out.println( "Stage.PRINTING" );
+        System.out.println( "Finished" );
 end
 
 /*
@@ -994,11 +1026,11 @@ end
     -->
     (halt))
 */
-rule "done"
-    agenda-group "1"
+//rule "done"
+//    agenda-group "1"
 
-    when
-        Stage( value == Stage.PRINTING )
-    then
-        System.out.println( "Finished" );
-end
+ //   when
+ //       Stage( value == Stage.PRINTING )
+//    then
+ //       System.out.println( "Finished" );
+//end
