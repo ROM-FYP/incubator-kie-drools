@@ -1,0 +1,27 @@
+#!/bin/bash
+BRANCHES=("base_exp_no_print" "base_exp_with_print" "mod_exp_no_print" "mod_exp_with_print")
+RESULTS_DIR=~/jmh_results
+PROJECT=/home/maheshdila/mahesh/research/incubator-kie-drools
+
+mkdir -p $RESULTS_DIR
+
+for BRANCH in "${BRANCHES[@]}"; do
+    echo "=== Running benchmark for: $BRANCH ==="
+    
+    cd $PROJECT
+    git checkout $BRANCH
+    mvn clean compile test-compile -f drools-examples/pom.xml -DskipTests -q
+    mvn dependency:build-classpath -f drools-examples/pom.xml \
+        -DincludeScope=test -Dmdep.outputFile=/tmp/jmh_cp.txt -q
+    
+    java -Xms512m -Xmx2g \
+        -cp "drools-examples/target/test-classes:drools-examples/target/classes:$(cat /tmp/jmh_cp.txt)" \
+        org.openjdk.jmh.Main WaltzDbJmhBenchmark \
+        -f 5 -wi 10 -i 50 -bm ss -tu ms \
+        -rff $RESULTS_DIR/${BRANCH}_results.csv -rf csv -prof gc
+    
+    echo "=== Completed: $BRANCH ==="
+    sleep 30  # Cool-down
+done
+
+echo "All experiments complete! Results in: $RESULTS_DIR"

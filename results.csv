@@ -1,0 +1,10 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: dataFile"
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb","ss",1,250,93.381889,1.479818,"ms/op",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.alloc.rate","ss",1,250,117.091764,0.456852,"MB/sec",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.alloc.rate.norm","ss",1,250,72999538.016000,242713.987100,"B/op",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.churn.G1_Eden_Space","ss",1,250,114.484267,13.231536,"MB/sec",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.churn.G1_Eden_Space.norm","ss",1,250,71479328.768000,8265597.920234,"B/op",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.churn.G1_Survivor_Space","ss",1,250,0.375663,0.234124,"MB/sec",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.churn.G1_Survivor_Space.norm","ss",1,250,234177.600000,145691.923159,"B/op",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.count","ss",1,250,205.000000,NaN,"counts",waltzdb16.dat
+"org.drools.benchmark.waltzdb.WaltzDbJmhBenchmark.runWaltzDb:·gc.time","ss",1,250,880.000000,NaN,"ms",waltzdb16.dat

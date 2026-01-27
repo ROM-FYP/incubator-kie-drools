@@ -150,6 +150,8 @@
     <version.org.mockito>5.17.0</version.org.mockito>
     <!-- Version of JMH -->
     <version.org.openjdk.jmh>1.21</version.org.openjdk.jmh>
+    <!-- Version of JGraphT -->
+    <version.org.jgrapht>1.5.2</version.org.jgrapht>
 
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
 
@@ -1050,7 +1052,18 @@
         <groupId>org.openjdk.jmh</groupId>
         <artifactId>jmh-generator-annprocess</artifactId>
         <version>${version.org.openjdk.jmh}</version>
-        <scope>test</scope>
+      </dependency>
+
+      <!-- JGraphT for graph algorithms -->
+      <dependency>
+        <groupId>org.jgrapht</groupId>
+        <artifactId>jgrapht-core</artifactId>
+        <version>${version.org.jgrapht}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jgrapht</groupId>
+        <artifactId>jgrapht-opt</artifactId>
+        <version>${version.org.jgrapht}</version>
       </dependency>
 
       <dependency>
