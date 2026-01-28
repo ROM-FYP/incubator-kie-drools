@@ -1,0 +1,5 @@
+
+cd /home/maheshdila/mahesh/research/incubator-kie-drools/drools-examples
+
+java -cp "target/classes:$(mvn dependency:build-classpath -q -Dmdep.outputFile=/dev/stdout)" \
+  org.drools.benchmark.waltzdb.parallel.BaselineVsPpebsComparison

@@ -42,9 +42,9 @@ import java.util.regex.*;
  */
 public class BaselineVsPpebsComparison {
 
-    private static final String DATA_FILE = "waltzdb16.dat";
-    private static final int WARMUP_ITERATIONS = 3;
-    private static final int MEASURED_ITERATIONS = 5;
+    private static final String DATA_FILE = "waltzdb4.dat";
+    private static final int WARMUP_ITERATIONS = 10;
+    private static final int MEASURED_ITERATIONS = 25;
 
     public static void main(String[] args) throws Exception {
         System.out.println("╔════════════════════════════════════════════════════════════════════╗");
