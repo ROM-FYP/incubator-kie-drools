@@ -46,6 +46,10 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-impact-analysis-model</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.jgrapht</groupId>
+      <artifactId>jgrapht-core</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
