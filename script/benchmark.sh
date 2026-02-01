@@ -15,12 +15,13 @@ fi
 echo "Using project directory: $PROJECT_DIR"
 cd "$PROJECT_DIR" || exit 1
 function show_help {
-    echo "Usage: ./run_benchmarks.sh [base|partitioned|phased|compare|verify]"
+    echo "Usage: ./run_benchmarks.sh [base|partitioned|phased|compare|compare-all|verify]"
     echo ""
     echo "  base        Run the standard sequential WaltzDB benchmark"
     echo "  partitioned Run the partitioned parallel benchmark (1-8 threads)"
     echo "  phased      Run the phased parallel benchmark (Recommended)"
     echo "  compare     Run head-to-head comparison (Baseline vs PPESB)"
+    echo "  compare-all Run 3-way comparison (Baseline vs BASE_POINT vs LABEL_PROPAGATION)"
     echo "  verify      Run correctness verification for PPESB"
     echo ""
 }
@@ -62,6 +63,13 @@ case "$MODE" in
         mvn exec:exec \
             -Dexec.executable="java" \
             -Dexec.args="-classpath %classpath org.drools.benchmark.waltzdb.parallel.BaselineVsPpebsComparison" \
+            -Dexec.classpathScope="test"
+        ;;
+    "compare-all")
+        echo "Running 3-Way Comparison (Baseline vs BASE_POINT vs LABEL_PROPAGATION)..."
+        mvn exec:exec \
+            -Dexec.executable="java" \
+            -Dexec.args="-classpath %classpath org.drools.benchmark.waltzdb.parallel.BaselineVsPpebsComparison all" \
             -Dexec.classpathScope="test"
         ;;
     "verify")

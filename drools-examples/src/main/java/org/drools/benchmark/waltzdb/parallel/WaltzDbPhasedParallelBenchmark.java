@@ -19,12 +19,14 @@
 package org.drools.benchmark.waltzdb.parallel;
 
 import org.drools.benchmark.waltzdb.*;
-import org.drools.benchmark.waltzdb.partition.WaltzDbGraphPartitioner;
-import org.drools.benchmark.waltzdb.partition.WaltzDbPartition;
 import org.drools.core.impl.RuleBaseFactory;
 import org.drools.kiesession.rulebase.InternalKnowledgeBase;
 import org.drools.kiesession.rulebase.KnowledgeBaseFactory;
 import org.drools.util.IoUtils;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.clustering.LabelPropagationClustering;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.definition.KiePackage;
 import org.kie.api.io.ResourceType;
@@ -40,7 +42,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Phased Parallel Execution with Synchronization Barriers (PPESB)
@@ -54,6 +55,16 @@ import java.util.stream.Collectors;
  */
 public class WaltzDbPhasedParallelBenchmark {
 
+    /**
+     * Partitioning strategy for Phase 2 edge clustering.
+     */
+    public enum PartitionStrategy {
+        /** Simple base-point grouping with greedy bin-packing */
+        BASE_POINT,
+        /** Label propagation clustering from JGraphT */
+        LABEL_PROPAGATION
+    }
+
     private static final String PHASE1_DRL = "org/drools/benchmark/waltzdb/parallel/waltzdb_phase1.drl";
     private static final String PHASE2_DRL = "org/drools/benchmark/waltzdb/parallel/waltzdb_phase2.drl";
     private static final String FULL_DRL = "waltzdb.drl";
@@ -61,11 +72,22 @@ public class WaltzDbPhasedParallelBenchmark {
     private final String dataFile;
     private final int numThreads;
     private final boolean verbose;
+    private final PartitionStrategy partitionStrategy;
 
     public WaltzDbPhasedParallelBenchmark(String dataFile, int numThreads, boolean verbose) {
+        this(dataFile, numThreads, verbose, PartitionStrategy.BASE_POINT);
+    }
+
+    public WaltzDbPhasedParallelBenchmark(String dataFile, int numThreads, boolean verbose,
+            PartitionStrategy strategy) {
         this.dataFile = dataFile;
         this.numThreads = numThreads;
         this.verbose = verbose;
+        this.partitionStrategy = strategy;
+    }
+
+    public PartitionStrategy getPartitionStrategy() {
+        return partitionStrategy;
     }
 
     /**
@@ -124,11 +146,17 @@ public class WaltzDbPhasedParallelBenchmark {
 
         // ========== PHASE 2: DETECT_JUNCTIONS (PARALLEL) ==========
         if (verbose)
-            System.out.println("\n>>> PHASE 2: DETECT_JUNCTIONS (Parallel with graph partitioning)");
+            System.out
+                    .println("\n>>> PHASE 2: DETECT_JUNCTIONS (Parallel with " + partitionStrategy + " partitioning)");
         long phase2Start = System.nanoTime();
 
-        // Use graph partitioning to group edges by connected components
-        Map<Integer, List<Edge>> edgePartitions = partitionEdgesByBasePoint(allEdges, numThreads);
+        // Use selected partitioning strategy
+        Map<Integer, List<Edge>> edgePartitions;
+        if (partitionStrategy == PartitionStrategy.LABEL_PROPAGATION) {
+            edgePartitions = partitionEdgesByLabelPropagation(allEdges, numThreads);
+        } else {
+            edgePartitions = partitionEdgesByBasePoint(allEdges, numThreads);
+        }
 
         List<Future<PhaseResult>> phase2Futures = new ArrayList<>();
         int partitionId = 0;
@@ -263,6 +291,84 @@ public class WaltzDbPhasedParallelBenchmark {
             }
             partitions.get(minIdx).addAll(group.getValue());
             partitionSizes[minIdx] += group.getValue().size();
+        }
+
+        return partitions;
+    }
+
+    /**
+     * Partition edges using Label Propagation clustering algorithm.
+     * Groups edges by graph community detection for better locality.
+     */
+    private Map<Integer, List<Edge>> partitionEdgesByLabelPropagation(Set<Edge> edges, int targetPartitions) {
+        // Build graph from edges (each Edge becomes a graph edge between p1 and p2)
+        Graph<Integer, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
+        Map<DefaultEdge, Edge> graphEdgeToWaltzEdge = new HashMap<>();
+
+        for (Edge edge : edges) {
+            graph.addVertex(edge.getP1());
+            graph.addVertex(edge.getP2());
+            DefaultEdge graphEdge = graph.addEdge(edge.getP1(), edge.getP2());
+            if (graphEdge != null) {
+                graphEdgeToWaltzEdge.put(graphEdge, edge);
+            }
+        }
+
+        // Run Label Propagation Clustering
+        LabelPropagationClustering<Integer, DefaultEdge> clustering = new LabelPropagationClustering<>(graph);
+        var clusters = clustering.getClustering();
+
+        // Build node-to-cluster mapping
+        Map<Integer, Integer> nodeToCluster = new HashMap<>();
+        List<Set<Integer>> clusterList = new ArrayList<>();
+        int clusterId = 0;
+        for (Set<Integer> cluster : clusters.getClusters()) {
+            clusterList.add(cluster);
+            for (Integer node : cluster) {
+                nodeToCluster.put(node, clusterId);
+            }
+            clusterId++;
+        }
+
+        // Bin clusters into target partitions using greedy bin-packing
+        List<Set<Integer>> sortedClusters = new ArrayList<>(clusterList);
+        sortedClusters.sort((a, b) -> Integer.compare(b.size(), a.size()));
+
+        Map<Integer, List<Edge>> partitions = new HashMap<>();
+        int[] partitionSizes = new int[targetPartitions];
+        Map<Integer, Integer> clusterToPartition = new HashMap<>();
+
+        for (int i = 0; i < targetPartitions; i++) {
+            partitions.put(i, new ArrayList<>());
+        }
+
+        for (int i = 0; i < sortedClusters.size(); i++) {
+            // Find smallest partition
+            int minIdx = 0;
+            for (int j = 1; j < targetPartitions; j++) {
+                if (partitionSizes[j] < partitionSizes[minIdx]) {
+                    minIdx = j;
+                }
+            }
+            clusterToPartition.put(i, minIdx);
+            partitionSizes[minIdx] += sortedClusters.get(i).size();
+        }
+
+        // Assign edges to partitions based on their p1 node's cluster
+        for (Edge edge : edges) {
+            Integer clusterOfP1 = nodeToCluster.get(edge.getP1());
+            if (clusterOfP1 != null) {
+                Integer partitionIdx = clusterToPartition.get(clusterOfP1);
+                if (partitionIdx != null) {
+                    partitions.get(partitionIdx).add(edge);
+                } else {
+                    // Fallback: assign to partition 0
+                    partitions.get(0).add(edge);
+                }
+            } else {
+                // Fallback: assign to partition 0
+                partitions.get(0).add(edge);
+            }
         }
 
         return partitions;
