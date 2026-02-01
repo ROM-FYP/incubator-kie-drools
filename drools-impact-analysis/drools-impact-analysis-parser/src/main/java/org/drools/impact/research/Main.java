@@ -68,5 +68,19 @@ public class Main {
         System.out.println(graphBuilder);
         System.out.println("Edge A->B exists: " + graphBuilder.hasEdge(ruleA, ruleB));
         System.out.println("Rule C is isolated: " + graphBuilder.isIsolated(ruleC));
+
+        // Example 3: Stratify rules into phases
+        System.out.println("\n=== Stratification Demo ===");
+
+        // Create a more complex example with phases
+        RuleMeta start = new RuleMeta("Start", Collections.emptySet(), Set.of("Init"));
+        RuleMeta processA = new RuleMeta("ProcessA", Set.of("Init"), Set.of("DataA"));
+        RuleMeta processB = new RuleMeta("ProcessB", Set.of("Init"), Set.of("DataB"));
+        RuleMeta combine = new RuleMeta("Combine", Set.of("DataA", "DataB"), Set.of("Result"));
+
+        List<RuleMeta> workflowRules = Arrays.asList(start, processA, processB, combine);
+        Stratifier stratifier = new Stratifier(workflowRules);
+
+        System.out.println(stratifier);
     }
 }
