@@ -364,9 +364,9 @@ public class WaltzDbPhasedParallelBenchmark {
      * Main method for standalone testing.
      */
     public static void main(String[] args) throws Exception {
-        String dataFile = "waltzdb16.dat";
+        String dataFile = "waltzdb16_original_50.dat";
         int[] threadCounts = { 1, 2, 4, 8 };
-        int iterations = 5;
+        int iterations = 50;
 
         System.out.println("╔══════════════════════════════════════════════════════════════╗");
         System.out.println("║  PPESB: Phased Parallel Execution with Sync Barriers         ║");

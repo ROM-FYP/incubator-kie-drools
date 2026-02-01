@@ -70,11 +70,11 @@ public class WaltzDbBenchmark {
             long now = System.currentTimeMillis();
             for (Line line : lines) {
                 ksession.insert(line);
-                System.out.println(line.getP1() + " " + line.getP2());
+                //System.out.println(line.getP1() + " " + line.getP2());
             }
             for (Label label : labels) {
                 ksession.insert(label);
-                System.out.println(label.getId() + " " + label.getType());
+                //System.out.println(label.getId() + " " + label.getType());
             }
 
             Stage stage = new Stage(Stage.DUPLICATE);

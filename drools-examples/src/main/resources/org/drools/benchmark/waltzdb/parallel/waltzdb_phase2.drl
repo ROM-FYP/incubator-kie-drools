@@ -1,24 +1,24 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+* Licensed to the Apache Software Foundation(ASF) under one
+* or more contributor license agreements. See the NOTICE file
+* distributed with this work for additional information
+* regarding copyright ownership. The ASF licenses this file
+* to you under the Apache License, Version 2.0(the
+* "License"); you may not use this file except in compliance
+* with the License. You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
 
 // Phase 2: DETECT_JUNCTIONS stage only - creates Junctions from Edges
-// Parallelizable when edges are grouped by basePoint (p1)
+// Parallelizable when edges are grouped by basePoint(p1)
 package org.drools.benchmark.waltzdb.parallel
 
 import org.drools.benchmark.waltzdb.Edge;
@@ -26,28 +26,30 @@ import org.drools.benchmark.waltzdb.Junction;
 
 // 3-way junction detection
 rule "make_3_junction_phase2"
-    when
-        $edge1 : Edge( $basePoint : p1, $p1 : p2, joined == false )
-        $edge2 : Edge( p1 == $basePoint, $p2 : p2 != $p1, joined == false )
-        $edge3 : Edge( p1 == $basePoint, $p3 : p2 != $p1, p2 != $p2, joined == false )
-    then
-        Junction junction = new Junction( $basePoint, "3j", 
-            "make_3_junction " + $basePoint + " " + $p1 + " " + $p2 + " " + $p3, "no" );
-        insert( junction );
-        modify( $edge1 ) { setJoined( true ), setType( "3j" ) }
-        modify( $edge2 ) { setJoined( true ), setType( "3j" ) }
-        modify( $edge3 ) { setJoined( true ), setType( "3j" ) }
+when
+    $edge1 : Edge( $basePoint : p1, $p1 : p2, joined == false )
+    $edge2 : Edge( p1 == $basePoint, $p2 : p2 != $p1, joined == false )
+    $edge3 : Edge( p1 == $basePoint, $p3 : p2 != $p1, p2 != $p2, joined == false )
+then
+    Junction junction = new Junction( $basePoint, "3j",
+    "make_3_junction " + $basePoint + " " + $p1 + " " + $p2 + " " + $p3, "no" );
+    insert(junction);
+    System.out.println( junction.toString() );
+    modify($edge1) { setJoined(true), setType("3j") }
+    modify($edge2) { setJoined(true), setType("3j") }
+    modify($edge3) { setJoined(true), setType("3j") }
 end
 
-// L-junction (2-way) detection
+// L-junction(2-way) detection
 rule "make_L_phase2"
-    when
-        $edge1 : Edge( $basePoint : p1, $p2 : p2, joined == false )
-        $edge2 : Edge( p1 == $basePoint, $p3 : p2 != $p2, joined == false )
-        not( Edge( p1 == $basePoint, p2 != $p2, p2 != $p3 ) )
-    then
-        Junction junction = new Junction( "2j", "L", $basePoint, $p2, $p3, "no" );
-        insert( junction );
-        modify( $edge1 ) { setJoined( true ), setType( "2j" ) }
-        modify( $edge2 ) { setJoined( true ), setType( "2j" ) }
+when
+    $edge1 : Edge( $basePoint : p1, $p2 : p2, joined == false )
+    $edge2 : Edge( p1 == $basePoint, $p3 : p2 != $p2, joined == false )
+    not( Edge( p1 == $basePoint, p2 != $p2, p2 != $p3 ) )
+then
+    Junction junction = new Junction("2j", "L", $basePoint, $p2, $p3, "no");
+    insert(junction);
+    System.out.println( junction.toString() );
+    modify($edge1) { setJoined(true), setType("2j") }
+    modify($edge2) { setJoined(true), setType("2j") }
 end
