@@ -174,6 +174,82 @@ Uses regex heuristics to detect:
 
 ---
 
+### `WaltzDbAnalyzer`
+The "Golden" integration test that demonstrates the complete analysis pipeline.
+
+Reads a DRL file, parses rules, builds the dependency graph, stratifies into phases, and prints beautiful console output with:
+- ANSI colored output
+- Rule metadata summary
+- Dependency graph statistics
+- Phase stratification with visual boxes
+- Parallelization potential analysis
+
+---
+
+## Running the WaltzDB Analyzer
+
+### Command-Line Options
+
+| Option | Description |
+| ------ | ----------- |
+| `-v`, `--verbose` | Show all rules in detailed output (default: first 10) |
+| `-h`, `--help` | Show usage help |
+| `[path]` | Path to DRL file (default: waltzdb.drl) |
+
+### Commands
+
+```bash
+cd /home/maheshdila/mahesh/research/incubator-kie-drools
+
+# Default: Analyze WaltzDB DRL (shows first 10 rules)
+mvn compile exec:java -pl drools-impact-analysis/drools-impact-analysis-parser \
+    -Dexec.mainClass="org.drools.impact.research.WaltzDbAnalyzer" -q
+
+# Verbose mode: Show ALL rules
+mvn compile exec:java -pl drools-impact-analysis/drools-impact-analysis-parser \
+    -Dexec.mainClass="org.drools.impact.research.WaltzDbAnalyzer" \
+    -Dexec.args="--verbose" -q
+
+# Custom DRL file
+mvn compile exec:java -pl drools-impact-analysis/drools-impact-analysis-parser \
+    -Dexec.mainClass="org.drools.impact.research.WaltzDbAnalyzer" \
+    -Dexec.args="/path/to/your/custom.drl" -q
+
+# Custom DRL file + Verbose mode
+mvn compile exec:java -pl drools-impact-analysis/drools-impact-analysis-parser \
+    -Dexec.mainClass="org.drools.impact.research.WaltzDbAnalyzer" \
+    -Dexec.args="--verbose /path/to/your/custom.drl" -q
+
+# Show help
+mvn compile exec:java -pl drools-impact-analysis/drools-impact-analysis-parser \
+    -Dexec.mainClass="org.drools.impact.research.WaltzDbAnalyzer" \
+    -Dexec.args="--help" -q
+```
+
+### Sample Output
+
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║   DRL ANALYZER - Rule Dependency Graph & Phase Stratification Tool           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📊 Summary:
+   • Total rules parsed:      34
+   • Dependency edges:        758
+   • Execution phases:        2
+   • Contains cycles:         Yes
+
+📈 Phase Breakdown:
+   Phase 1: ████████████████████████████████████████ 33 rules
+   Phase 2: ██ 1 rules
+
+⚡ Parallelization Potential:
+   • Max rules per phase:     33
+   • Sequential phases:       2
+```
+
+---
+
 ## Running the Demo
 
 ```bash
