@@ -57,7 +57,7 @@ public class WaltzDbBenchmark {
         final InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConfiguration);
         //                final RuleBase ruleBase = RuleBaseFactory.newRuleBase( RuleBase.RETEOO,
         //                                                               conf );
-        int iterations = 10;
+        int iterations = 1;
         double average_time = 0;
         KieSession ksession;
         kbase.addPackages(pkgs);

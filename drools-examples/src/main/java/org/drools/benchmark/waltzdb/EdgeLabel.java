@@ -23,6 +23,7 @@ public class EdgeLabel {
     private int p2;
     private String labelName;
     private String labelId;
+    private boolean printed = false;
     public EdgeLabel() {
         super();
     }
@@ -92,4 +93,6 @@ public class EdgeLabel {
     public void setP2(int p2) {
         this.p2 = p2;
     }
+    public boolean isPrinted() {return printed;}
+    public void setPrinted(boolean printed) {this.printed = printed;}
 }

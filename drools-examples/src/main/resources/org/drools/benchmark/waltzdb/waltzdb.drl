@@ -189,7 +189,7 @@ end
 rule "initial_boundary_junction_arrow"
     when
         $stage : Stage( value == Stage.FIND_INITIAL_BOUNDARY )
-        $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
+        $junction : Junction( type == "3j", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
         $edge1 : Edge( p1 == $basePoint, p2 == $p1 )
         $edge2 : Edge( p1 == $basePoint, p2 == $p2 )
         $edge3 : Edge( p1 == $basePoint, p2 == $p3 ) //@FIXME, is this correct? I changed edge2 to edge3
@@ -253,7 +253,7 @@ end
 rule "second_boundary_junction_arrow"
     when
         $stage : Stage( value == Stage.FIND_SECOND_BOUDARY )
-        $junction : Junction( type == "3j", name == "arrow", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
+        $junction : Junction( type == "3j", $basePoint : basePoint, $p1 : p1, $p2 : p2, $p3 : p3 )
         Edge( p1 == $basePoint, p2 == $p1 )
         Edge( p1 == $basePoint, p2 == $p2 )
         Edge( p1 == $basePoint, p2 == $p3 )
@@ -920,9 +920,14 @@ end
 rule "done_labeling"
     when
         $stage : Stage( value == Stage.LABELING )
+        $edgeLabel: EdgeLabel( $basePoint : p1, $p1 : p2,$labelName:labelName, $labelId :labelId , printed == false)
+
     then
-        modify( $stage ) {setValue( Stage.PRINTING )}
-        System.out.println( "Stage.PRINTING" );
+        //modify( $stage ) {setValue( Stage.PRINTING )}
+        System.out.println( "EdgeLabel " + $basePoint + " " + $p1 + " " + $labelName + " " + $labelId );
+        modify( $edgeLabel ) {setPrinted( true )}
+        //System.out.println( "Stage.PRINTING" );
+
 end
 
 /*
@@ -931,6 +936,17 @@ end
     -->
     (halt))
 */
+rule "done_printing"
+    when
+        $stage : Stage( value == Stage.LABELING )
+        not(EdgeLabel(  printed == false))
+
+    then
+        modify( $stage ) {setValue( Stage.PRINTING )}
+        System.out.println( "Stage.PRINTING" );
+
+end
+
 rule "done"
     when
         Stage( value == Stage.PRINTING )
