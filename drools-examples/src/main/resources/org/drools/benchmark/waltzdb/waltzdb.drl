@@ -27,6 +27,7 @@ import org.drools.benchmark.waltzdb.EdgeLabel;
 import org.drools.benchmark.waltzdb.Junction;
 import org.drools.benchmark.waltzdb.Label;
 import org.drools.benchmark.waltzdb.Illegal;
+import org.drools.benchmark.waltzdb.RuleTimingTracker;
 /*
 // Reverse the edges
 //(p reverse_edges
@@ -37,6 +38,16 @@ import org.drools.benchmark.waltzdb.Illegal;
 //   (make edge ^p1 <p2> ^p2 <p1> ^joined false)
 //    (remove 2))
 */
+// Timing marker: fires BEFORE reverse_edges starts (highest salience in DUPLICATE stage)
+rule "start_timing_duplicate" salience 1000
+    when
+        Stage( value == Stage.DUPLICATE )
+        exists Line()
+        eval( !RuleTimingTracker.getInstance().hasStarted() )
+    then
+        RuleTimingTracker.getInstance().recordReverseEdgesStart();
+end
+
 rule "reverse_edges"
     when
         Stage( value == Stage.DUPLICATE )
@@ -61,6 +72,15 @@ rule "done_reversing"
     then
         modify( $stage ) {setValue( Stage.DETECT_JUNCTIONS )}
         System.out.println( "Stage.DETECT_JUNCTIONS" );
+end
+
+// Timing marker: fires AFTER done_reversing completes (when stage transitions)
+rule "end_timing_duplicate" salience 1000
+    when
+        Stage( value == Stage.DETECT_JUNCTIONS )
+        eval( !RuleTimingTracker.getInstance().hasEnded() )
+    then
+        RuleTimingTracker.getInstance().recordDoneReversingEnd();
 end
 
 /*
